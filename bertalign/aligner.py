@@ -1,6 +1,5 @@
 import numpy as np
 
-from bertalign import model
 from bertalign.corelib import find_first_search_path
 from bertalign.corelib import find_second_search_path
 from bertalign.corelib import find_top_k_sents
@@ -9,6 +8,7 @@ from bertalign.corelib import first_pass_align
 from bertalign.corelib import get_alignment_types
 from bertalign.corelib import second_back_track
 from bertalign.corelib import second_pass_align
+from bertalign.encoder import Encoder
 from bertalign.utils import LANG
 from bertalign.utils import clean_text
 from bertalign.utils import detect_lang
@@ -30,6 +30,7 @@ class Bertalign:
         input_type="raw",
         src_lang=None,
         tgt_lang=None,
+        model_name="LaBSE",
     ):
         self.max_align = max_align
         self.top_k = top_k
@@ -92,6 +93,13 @@ class Bertalign:
         print("Source language: {}, Number of sentences: {}".format(src_lang, src_num))
         print("Target language: {}, Number of sentences: {}".format(tgt_lang, tgt_num))
 
+
+        # transformation takes place in the constructor
+        # the model comes from the global scope
+
+        # See other cross-lingual embedding models at
+        # https://www.sbert.net/docs/pretrained_models.html
+        model = Encoder(model_name)
         print("Embedding source text using {} ...".format(model.model_name))
         src_vecs, src_lens = model.transform(src_sents, max_align - 1)
         print("Embedding target text using {} ...".format(model.model_name))
