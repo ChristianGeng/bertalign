@@ -63,9 +63,7 @@ def score_multiple(gold_list, test_list, value_for_div_by_0=0.0):
 
 
 def _precision(goldalign, testalign):
-    """
-    Computes tpstrict, fpstrict, tplax, fplax for gold/test alignments
-    """
+    """Computes tpstrict, fpstrict, tplax, fplax for gold/test alignments."""
     tpstrict = 0  # true positive strict counter
     tplax = 0  # true positive lax counter
     fpstrict = 0  # false positive strict counter
