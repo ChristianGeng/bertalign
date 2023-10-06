@@ -3,6 +3,7 @@ import numpy as np
 from sentence_transformers import SentenceTransformer
 from bertalign.utils import yield_overlaps
 
+
 class Encoder:
     def __init__(self, model_name):
         self.model = SentenceTransformer(model_name)

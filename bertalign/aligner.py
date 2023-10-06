@@ -5,21 +5,22 @@ from bertalign import model
 from bertalign.corelib import *
 from bertalign.utils import *
 
-class Bertalign:
-    def __init__(self,
-                 src_raw,
-                 tgt_raw,
-                 max_align=5,
-                 top_k=3,
-                 win=5,
-                 skip=-0.1,
-                 margin=True,
-                 len_penalty=True,
-                 input_type='raw',
-                 src_lang=None,
-                 tgt_lang=None,
-               ):
 
+class Bertalign:
+    def __init__(
+        self,
+        src_raw,
+        tgt_raw,
+        max_align=5,
+        top_k=3,
+        win=5,
+        skip=-0.1,
+        margin=True,
+        len_penalty=True,
+        input_type="raw",
+        src_lang=None,
+        tgt_lang=None,
+    ):
         self.max_align = max_align
         self.top_k = top_k
         self.win = win
@@ -27,11 +28,14 @@ class Bertalign:
         self.margin = margin
         self.len_penalty = len_penalty
 
-        input_types = ['raw', 'lines', 'tokenized']
+        input_types = ["raw", "lines", "tokenized"]
         if input_type not in input_types:
-            raise ValueError("Invalid input type '%s'. Expected one of: %s" % (input_type, input_types))
+            raise ValueError(
+                "Invalid input type '%s'. Expected one of: %s"
+                % (input_type, input_types)
+            )
 
-        if input_type == 'lines':
+        if input_type == "lines":
             # need to split
             src = clean_text(src_raw)
             tgt = clean_text(tgt_raw)
@@ -43,8 +47,7 @@ class Bertalign:
             if not tgt_lang:
                 tgt_lang = detect_lang(tgt)
 
-
-        elif input_type == 'raw':
+        elif input_type == "raw":
             src = clean_text(src_raw)
             tgt = clean_text(tgt_raw)
 
@@ -56,8 +59,7 @@ class Bertalign:
             src_sents = split_sents(src, src_lang)
             tgt_sents = split_sents(tgt, tgt_lang)
 
-        elif input_type == 'tokenized':
-
+        elif input_type == "tokenized":
             if not src_lang:
                 src_lang = detect_lang(src)
             if not tgt_lang:
@@ -67,10 +69,9 @@ class Bertalign:
             tgt_sents = tgt_raw
 
             if not src_lang:
-                src_lang = detect_lang(' '.join(src_sents))
+                src_lang = detect_lang(" ".join(src_sents))
             if not tgt_lang:
-                tgt_lang = detect_lang(' '.join(tgt_sents))
-
+                tgt_lang = detect_lang(" ".join(tgt_sents))
 
         src_num = len(src_sents)
         tgt_num = len(tgt_sents)
@@ -101,34 +102,63 @@ class Bertalign:
         self.tgt_vecs = tgt_vecs
 
     def align_sents(self):
-
         print("Performing first-step alignment ...")
-        D, I = find_top_k_sents(self.src_vecs[0,:], self.tgt_vecs[0,:], k=self.top_k)
-        first_alignment_types = get_alignment_types(2) # 0-1, 1-0, 1-1
+        D, I = find_top_k_sents(self.src_vecs[0, :], self.tgt_vecs[0, :], k=self.top_k)
+        first_alignment_types = get_alignment_types(2)  # 0-1, 1-0, 1-1
         first_w, first_path = find_first_search_path(self.src_num, self.tgt_num)
-        first_pointers = first_pass_align(self.src_num, self.tgt_num, first_w, first_path, first_alignment_types, D, I)
-        first_alignment = first_back_track(self.src_num, self.tgt_num, first_pointers, first_path, first_alignment_types)
+        first_pointers = first_pass_align(
+            self.src_num, self.tgt_num, first_w, first_path, first_alignment_types, D, I
+        )
+        first_alignment = first_back_track(
+            self.src_num,
+            self.tgt_num,
+            first_pointers,
+            first_path,
+            first_alignment_types,
+        )
 
         print("Performing second-step alignment ...")
         second_alignment_types = get_alignment_types(self.max_align)
-        second_w, second_path = find_second_search_path(first_alignment, self.win, self.src_num, self.tgt_num)
-        second_pointers = second_pass_align(self.src_vecs, self.tgt_vecs, self.src_lens, self.tgt_lens,
-                                            second_w, second_path, second_alignment_types,
-                                            self.char_ratio, self.skip, margin=self.margin, len_penalty=self.len_penalty)
-        second_alignment = second_back_track(self.src_num, self.tgt_num, second_pointers, second_path, second_alignment_types)
+        second_w, second_path = find_second_search_path(
+            first_alignment, self.win, self.src_num, self.tgt_num
+        )
+        second_pointers = second_pass_align(
+            self.src_vecs,
+            self.tgt_vecs,
+            self.src_lens,
+            self.tgt_lens,
+            second_w,
+            second_path,
+            second_alignment_types,
+            self.char_ratio,
+            self.skip,
+            margin=self.margin,
+            len_penalty=self.len_penalty,
+        )
+        second_alignment = second_back_track(
+            self.src_num,
+            self.tgt_num,
+            second_pointers,
+            second_path,
+            second_alignment_types,
+        )
 
-        print("Finished! Successfully aligning {} {} sentences to {} {} sentences\n".format(self.src_num, self.src_lang, self.tgt_num, self.tgt_lang))
+        print(
+            "Finished! Successfully aligning {} {} sentences to {} {} sentences\n".format(
+                self.src_num, self.src_lang, self.tgt_num, self.tgt_lang
+            )
+        )
         self.result = second_alignment
 
     def print_sents(self):
-        for bead in (self.result):
+        for bead in self.result:
             src_line = self._get_line(bead[0], self.src_sents)
             tgt_line = self._get_line(bead[1], self.tgt_sents)
             print(src_line + "\n" + tgt_line + "\n")
 
     @staticmethod
     def _get_line(bead, lines):
-        line = ''
+        line = ""
         if len(bead) > 0:
-            line = ' '.join(lines[bead[0]:bead[-1]+1])
+            line = " ".join(lines[bead[0] : bead[-1] + 1])
         return line
