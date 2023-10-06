@@ -1,8 +1,18 @@
 import numpy as np
 
 from bertalign import model
-from bertalign.corelib import *
-from bertalign.utils import *
+from bertalign.corelib import (
+    find_first_search_path,
+    find_second_search_path,
+    find_top_k_sents,
+    first_back_track,
+    first_pass_align,
+    get_alignment_types,
+    second_back_track,
+    second_pass_align,
+)
+
+from bertalign.utils import LANG, clean_text, detect_lang, split_sents
 
 
 class Bertalign:
