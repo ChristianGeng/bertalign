@@ -1,8 +1,8 @@
 import sys
-import numpy as np
-
 from ast import literal_eval
 from collections import defaultdict
+
+import numpy as np
 
 
 def score_multiple(gold_list, test_list, value_for_div_by_0=0.0):

@@ -1,4 +1,5 @@
 import re
+
 from googletrans import Translator
 from sentence_splitter import SentenceSplitter
 

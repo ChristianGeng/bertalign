@@ -1,6 +1,5 @@
 import numpy as np
 
-
 from bertalign import model
 from bertalign.corelib import *
 from bertalign.utils import *

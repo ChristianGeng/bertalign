@@ -1,6 +1,6 @@
 import numpy as np
-
 from sentence_transformers import SentenceTransformer
+
 from bertalign.utils import yield_overlaps
 
 

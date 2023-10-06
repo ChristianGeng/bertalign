@@ -1,10 +1,9 @@
-"""
-Bertalign initialization
-"""
+"""Bertalign initialization."""
 
 __author__ = "Jason (bfsujason@163.com)"
 __version__ = "1.1.0"
 
+from bertalign.aligner import Bertalign
 from bertalign.encoder import Encoder
 
 # See other cross-lingual embedding models at
@@ -12,5 +11,3 @@ from bertalign.encoder import Encoder
 
 model_name = "LaBSE"
 model = Encoder(model_name)
-
-from bertalign.aligner import Bertalign

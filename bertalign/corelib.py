@@ -1,8 +1,9 @@
-import torch
-import faiss
-import numpy as np
-import numba as nb
 from sys import platform
+
+import faiss
+import numba as nb
+import numpy as np
+import torch
 
 
 def second_back_track(i, j, pointers, search_path, a_types):
