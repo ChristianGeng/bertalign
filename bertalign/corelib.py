@@ -38,20 +38,21 @@ def second_pass_align(
     margin=False,
     len_penalty=False,
 ):
-    """
-    Perform the second-pass alignment to extract m-n bitext segments.
+    """Perform the second-pass alignment to extract m-n bitext segments.
 
     Args:
-        src_vecs: numpy array of shape (max_align-1, num_src_sents, embedding_size).
-        tgt_vecs: numpy array of shape (max_align-1, num_tgt_sents, embedding_size).
-        src_lens: numpy array of shape (max_align-1, num_src_sents).
-        tgt_lens: numpy array of shape (max_align-1, num_tgt_sents).
-        w: int. Predefined window size for the second-pass alignment.
-        search_path: numpy array. Second-pass alignment search path.
-        align_types: numpy array. Second-pass alignment types.
-        char_ratio: float. Source to target length ratio.
-        skip: float. Cost for instertion and deletion.
-        margin: boolean. True if choosing modified cosine similarity score.
+        src_vecs: numpy array of shape (max_align-1, num_src_sents, embedding_size)
+        tgt_vecs: numpy array of shape (max_align-1, num_tgt_sents, embedding_size)
+        src_lens: numpy array of shape (max_align-1, num_src_sents)
+        tgt_lens: numpy array of shape (max_align-1, num_tgt_sents)
+        w: int. Predefined window size for the second-pass alignment
+        search_path: numpy array. Second-pass alignment search path
+        align_types: numpy array. Second-pass alignment types
+        char_ratio: float. Source to target length ratio
+        skip: float. Cost for instertion and deletion
+        margin: boolean. True if choosing modified cosine similarity score
+        len_penalty: consider difference between src and target sentences
+
     Returns:
         pointers: numpy array recording best alignments for each DP cell.
     """
@@ -179,8 +180,7 @@ def calculate_neighbor_similarity(vec, overlap, sent_idx, sent_len, db):
 def calculate_length_penalty(
     src_lens, tgt_lens, src_idx, tgt_idx, src_overlap, tgt_overlap, char_ratio
 ):
-    """
-    Calculate the length-based similarity score of bitext segment.
+    """Calculate the length-based similarity score of bitext segment.
 
     Args:
         src_lens: numpy array. Source sentence lengths vector.
@@ -190,6 +190,7 @@ def calculate_length_penalty(
         src_overlap: int. Number of sentences in source segment.
         tgt_overlap: int. Number of sentences in target segment.
         char_ratio: float. Source to target sentence length ratio.
+
     Returns:
         length_penalty: float. Similarity score based on length differences.
     """
@@ -208,15 +209,16 @@ def nb_dot(x, y):
 
 
 def find_second_search_path(align, w, src_len, tgt_len):
-    """
-    Convert 1-1 first-pass alignment to the second-round path.
+    """Convert 1-1 first-pass alignment to the second-round path.
 
     The indices along X-axis and Y-axis must be consecutive.
+
     Args:
         align: list of tuples. First-pass alignment results.
         w: int. Predefined window size for the second path.
         src_len: int. Number of source sentences.
         tgt_len: int. Number of target sentences.
+
     Returns:
         path: numpy array. Search path for the second-pass alignment.
     """
@@ -254,8 +256,7 @@ def find_second_search_path(align, w, src_len, tgt_len):
 
 
 def first_back_track(i, j, pointers, search_path, a_types):
-    """
-    Retrieve 1-1 alignments from the first-pass DP table.
+    """Retrieve 1-1 alignments from the first-pass DP table.
 
     Args:
         i: int. Number of source sentences.
@@ -263,6 +264,7 @@ def first_back_track(i, j, pointers, search_path, a_types):
         pointers: numpy array. Backpointer matrix of first-pass alignment.
         search_path: numpy array. First-pass search path.
         a_types: numpy array. First-pass alignment types.
+
     Returns:
         alignment: list of tuples for 1-1 alignments.
     """
@@ -284,8 +286,7 @@ def first_back_track(i, j, pointers, search_path, a_types):
 
 @nb.jit(nopython=True, fastmath=True, cache=True)
 def first_pass_align(src_len, tgt_len, w, search_path, align_types, dist, index):
-    """
-    Perform the first-pass alignment to extract only 1-1 bitext segments.
+    """Perform the first-pass alignment to extract only 1-1 bitext segments.
 
     Args:
         src_len: int. Number of source sentences.
@@ -295,6 +296,7 @@ def first_pass_align(src_len, tgt_len, w, search_path, align_types, dist, index)
         align_types: numpy array. Alignment types for the first-pass alignment.
         dist: numpy array. Distance matrix for top-k similar vecs.
         index: numpy array. Index matrix for top-k similar vecs.
+
     Returns:
         pointers: numpy array recording best alignments for each DP cell.
     """
@@ -347,14 +349,14 @@ def first_pass_align(src_len, tgt_len, w, search_path, align_types, dist, index)
 
 
 def find_first_search_path(src_len, tgt_len, min_win_size=250, percent=0.06):
-    """
-    Find the window size and search path for the first-pass alignment.
+    """Find the window size and search path for the first-pass alignment.
 
     Args:
         src_len: int. Number of source sentences.
         tgt_len: int. Number of target sentences.
         min_win_size: int. Minimum window size.
-        percent. float. Percent of longer sentences.
+        percent: float. Percent of longer sentences.
+
     Returns:
         win_size: int. Window size along the diagonal of the DP table.
         search_path: numpy array of shape (src_len + 1, 2), containing the start
@@ -374,12 +376,12 @@ def find_first_search_path(src_len, tgt_len, min_win_size=250, percent=0.06):
 
 
 def get_alignment_types(max_alignment_size):
-    """
-    Get all the possible alignment types.
+    r"""Get all the possible alignment types.
 
     Args:
         max_alignment_size: int. Source sentence number +
                                  Target sentence number <= this value.
+
     Returns:
         alignment_types: numpy array.
     """
@@ -392,13 +394,13 @@ def get_alignment_types(max_alignment_size):
 
 
 def find_top_k_sents(src_vecs, tgt_vecs, k=3):
-    """
-    Find the top_k similar vecs in tgt_vecs for each vec in src_vecs.
+    """Find the top_k similar vecs in tgt_vecs for each vec in src_vecs.
 
     Args:
         src_vecs: numpy array of shape (num_src_sents, embedding_size).
         tgt_vecs: numpy array of shape (num_tgt_sents, embedding_size).
         k: int. Number of most similar target sentences.
+
     Returns:
         D: numpy array. Similarity score matrix of shape (num_src_sents, k).
         I: numpy array. Target index matrix of shape (num_src_sents, k).

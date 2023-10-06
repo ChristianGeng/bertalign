@@ -1,6 +1,6 @@
-import sys
 from ast import literal_eval
 from collections import defaultdict
+import sys
 
 import numpy as np
 
@@ -134,13 +134,13 @@ def read_alignments(file):
             fields = [x.strip() for x in line.split(":") if len(x.strip())]
             if len(fields) < 2:
                 raise Exception(
-                    'Got line "%s", which does not have at least two ":" separated fields'
+                    'Got line "%s", not having at least two ":" separated fields'
                     % line.strip()
                 )
             try:
                 src = literal_eval(fields[0])
                 tgt = literal_eval(fields[1])
-            except:
+            except Exception:
                 raise Exception('Failed to parse line "%s"' % line.strip())
             alignments.append((src, tgt))
     return alignments

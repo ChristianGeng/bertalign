@@ -23,6 +23,8 @@ extend-ignore = [
     'D103',  # Missing docstring in public function
     'D104',  # Missing docstring in public package
     'D107',  # Missing docstring in `__init__`
+    'E741',  # Allow variables named 'I'
+    'N806',  # Allow upper case variable names (matrices)
 ]
 
 # same as black

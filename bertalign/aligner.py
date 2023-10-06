@@ -1,21 +1,22 @@
 import numpy as np
 
 from bertalign import model
-from bertalign.corelib import (
-    find_first_search_path,
-    find_second_search_path,
-    find_top_k_sents,
-    first_back_track,
-    first_pass_align,
-    get_alignment_types,
-    second_back_track,
-    second_pass_align,
-)
-
-from bertalign.utils import LANG, clean_text, detect_lang, split_sents
+from bertalign.corelib import find_first_search_path
+from bertalign.corelib import find_second_search_path
+from bertalign.corelib import find_top_k_sents
+from bertalign.corelib import first_back_track
+from bertalign.corelib import first_pass_align
+from bertalign.corelib import get_alignment_types
+from bertalign.corelib import second_back_track
+from bertalign.corelib import second_pass_align
+from bertalign.utils import LANG
+from bertalign.utils import clean_text
+from bertalign.utils import detect_lang
+from bertalign.utils import split_sents
 
 
 class Bertalign:
+    r"""Main Aligner Class."""
     def __init__(
         self,
         src_raw,
@@ -111,6 +112,7 @@ class Bertalign:
         self.tgt_vecs = tgt_vecs
 
     def align_sents(self):
+        r"""Aligner Invokation."""
         print("Performing first-step alignment ...")
         D, I = find_top_k_sents(self.src_vecs[0, :], self.tgt_vecs[0, :], k=self.top_k)
         first_alignment_types = get_alignment_types(2)  # 0-1, 1-0, 1-1
@@ -153,13 +155,12 @@ class Bertalign:
         )
 
         print(
-            "Finished! Successfully aligning {} {} sentences to {} {} sentences\n".format(
-                self.src_num, self.src_lang, self.tgt_num, self.tgt_lang
-            )
-        )
+            "Successfully aligned {} {} sentences to {} {} sentences\n".format(
+                self.src_num, self.src_lang, self.tgt_num, self.tgt_lang))
         self.result = second_alignment
 
     def print_sents(self):
+        """Print aligned sentence pairs."""
         for bead in self.result:
             src_line = self._get_line(bead[0], self.src_sents)
             tgt_line = self._get_line(bead[1], self.tgt_sents)
