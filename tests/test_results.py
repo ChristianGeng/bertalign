@@ -8,6 +8,19 @@ from bertalign.eval import score_multiple
 from bertalign.eval import log_final_scores
 
 
+aligner_spec_explicit = {
+    "input_type": "lines",
+    "src_lang": "de",
+    "tgt_lang": "fr",
+}
+
+
+aligner_spec_detect = {
+    "input_type": "lines",
+}
+
+
+
 def align_text_and_berg(filespec, aligner_spec):
     r"""Align Text and Berg using the original aligner."""
 
@@ -50,17 +63,6 @@ def test_aligner_original(text_and_berg_expected_results, text_and_berg_inputs):
         for metric in expected:
             assert expected[metric] == calculated[metric], "Result mismatch"
 
-
-aligner_spec_explicit = {
-    "input_type": "lines",
-    "src_lang": "de",
-    "tgt_lang": "fr",
-}
-
-
-aligner_spec_detect = {
-    "input_type": "lines",
-}
 
 # @pytest.mark.parametrize("aligner_spec", [aligner_spec_detect])
 @pytest.mark.parametrize("aligner_spec", [aligner_spec_explicit])
